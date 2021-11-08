@@ -33,7 +33,7 @@ def data_split(post1, post2, label1, label2):
 
     return train_posts, train_label, test_posts, test_label
 
-def countvec_encode_predict(train_posts, train_label, test_posts, test_label):
+def countvec_encode(train_posts, train_label, test_posts, test_label):
     # pull the data into vectors
     vectorizer = CountVectorizer(max_df=0.25, ngram_range=(2, 3))
     train_x = vectorizer.fit_transform(train_posts)
@@ -44,6 +44,18 @@ def countvec_encode_predict(train_posts, train_label, test_posts, test_label):
     test_y = encoder.transform(test_label)
 
     return train_x, test_x, train_y, test_y
+
+def tfidfvec_encode(train_posts, train_label, test_posts, test_label):
+    vectorizer = TfidfVectorizer(max_df=0.25, ngram_range=(2, 3))
+    train_x = vectorizer.fit_transform(train_posts)
+    test_x = vectorizer.transform(test_posts)
+    
+    encoder = LabelEncoder()
+    train_y = encoder.fit_transform(train_label)
+    test_y = encoder.transform(test_label)
+
+    return train_x, test_x, train_y, test_y
+
 
 def NBmodel(train_x, test_x, train_y, test_y):
 
