@@ -33,7 +33,7 @@ def preprocess(file1, file2):
         header = next(csvr)
         for row in csvr:
             suicide_depression_posts[row[1]] = row[2] 
-
+        # change the text to lower case and collect all posts
         suicide_posts = [k for k, v in suicide_depression_posts.items() if v == 'suicide']
         depress_posts = [k for k, v in suicide_depression_posts.items() if v == 'non-suicide']
         # print(len(suicide_posts), len(depress_posts))  result: 116037
@@ -81,7 +81,7 @@ def preprocess(file1, file2):
     
     # remove the unnecessary meaningless chars 
     def normalize_text(s):
-        # just in case
+        # convert all posts into lowercase
         s = str(s)
         s = s.lower()
 
