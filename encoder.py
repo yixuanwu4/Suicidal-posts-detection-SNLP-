@@ -1,8 +1,5 @@
-import csv
-import sys
 import random
-import re
-from collections import Counter
+from sklearn.model_selection import cross_val_score
 from numpy.lib.function_base import vectorize
 # function for transforming documents into counts
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
@@ -61,10 +58,14 @@ def NBmodel(train_x, test_x, train_y, test_y):
 
     nb = MultinomialNB(alpha = 1)
     nb.fit(train_x, train_y)
-    print(nb.get_params(deep=True))
+    # print(nb.get_params(deep=True))
+
+    
+    cv_score = cross_val_score(nb, train_x, train_y, scoring='accuracy', cv=10)
+    print("An estimated score for each run of the cross validation is presented below: \n" + str(cv_score) + '\n')
 
     pred_y = nb.predict(test_x)
     precision, recall, f1_xcore, x = precision_recall_fscore_support(test_y, pred_y, average='macro')
-    print("Precision: " + str(precision) + "\nRecall: " + str(recall) + "\nF-beta score: " + str(f1_xcore) )
-
+    # print("Precision: " + str(precision) + "\nRecall: " + str(recall) + "\nF-beta score: " + str(f1_xcore) )
+    return precision, recall, f1_xcore
 
