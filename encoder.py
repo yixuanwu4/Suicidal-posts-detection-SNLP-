@@ -35,7 +35,7 @@ def data_split(post1, post2, label1, label2):
 
 def countvec_encode(train_posts, train_label, test_posts, test_label):
     # pull the data into vectors
-    vectorizer = CountVectorizer(max_df=0.25, ngram_range=(2, 3))
+    vectorizer = CountVectorizer(max_df=0.25, ngram_range=(2, 3), stop_words='english')
     train_x = vectorizer.fit_transform(train_posts)
     test_x = vectorizer.transform(test_posts)
     
@@ -46,7 +46,7 @@ def countvec_encode(train_posts, train_label, test_posts, test_label):
     return train_x, test_x, train_y, test_y
 
 def tfidfvec_encode(train_posts, train_label, test_posts, test_label):
-    vectorizer = TfidfVectorizer(max_df=0.25, ngram_range=(2, 3))
+    vectorizer = TfidfVectorizer(max_df=0.25, ngram_range=(2, 3), stop_words='english')
     train_x = vectorizer.fit_transform(train_posts)
     test_x = vectorizer.transform(test_posts)
     

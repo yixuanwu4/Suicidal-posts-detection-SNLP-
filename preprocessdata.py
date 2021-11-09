@@ -110,7 +110,6 @@ def preprocess(file1, file2):
     return suicide_posts, depress_posts, general_posts, suicide_label, depress_label, general_label
 
 
-
     
 
 suicide_posts, depress_posts, general_posts, suicide_label, depress_label, general_label = preprocess("Suicide_Detection.csv", "reddit_data.csv")
