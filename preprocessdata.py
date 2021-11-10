@@ -14,11 +14,14 @@ from sklearn.preprocessing import LabelEncoder
 # the Naive Bayes model
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import precision_recall_fscore_support
+from nltk.tokenize import word_tokenize
+import nltk
+from nltk.corpus import stopwords
 
 
 def preprocess(file1, file2):
 
-    # ----------- Data preprocessing ---------- #
+    # ----------- DATA PREPROCESSING ---------- #
 
     global suicide_posts 
     global depress_posts 
@@ -29,11 +32,11 @@ def preprocess(file1, file2):
     with open(file1) as f:
         csvr = csv.reader(f, delimiter=',')
         header = []
-        # Extract the field names
+        # EXTRACT THE FIELD NAME
         header = next(csvr)
         for row in csvr:
             suicide_depression_posts[row[1]] = row[2] 
-        # change the text to lower case and collect all posts
+        # CHANGE THE TEXT TO LOWER CASE AND COLLECT ALL POSTS
         suicide_posts = [k for k, v in suicide_depression_posts.items() if v == 'suicide']
         depress_posts = [k for k, v in suicide_depression_posts.items() if v == 'non-suicide']
         # print(len(suicide_posts), len(depress_posts))  result: 116037
@@ -49,7 +52,9 @@ def preprocess(file1, file2):
         rows = []
         for row in csvr:
             try:
-                general_posts[row[1]] = row[2] 
+                if row[2] != 'pcmasterrace':
+                    general_posts[row[1]] = row[2] # REMOVE POSTS UNDER 'pcmasterrace' WHICH CONTAINS TOO MUCH PC-RELATED WORDS WHICH HAS HIGH FREQUENCY
+                 
             except:
                 continue
     lis = []
@@ -69,7 +74,7 @@ def preprocess(file1, file2):
                 postsnum.append(k)
         # print(i, len(postsnum)) # 4161, 8923, 10268, 8819, 6075
     
-    # As these general posts are not the target suicidal posts, they're all labelled as 'general'
+    # SET LABEL "GENERAL" TO ALL POSTS FROM THE GENERAL TOPICS
     general_posts = {x:'general' for x in general_posts}
     
     # because the "general" posts are way less than the suicide and non-suicide posts (depression posts)
@@ -79,31 +84,51 @@ def preprocess(file1, file2):
     depress_posts = depress_posts[:10000]
     general_posts = list(general_posts.keys())[:10000]
     
+    # # Stop words are nothing but high-frequency words
+    STOP_WORDS_LIST =stopwords.words('english')
+
     # remove the unnecessary meaningless chars 
     def normalize_text(s):
         # convert all posts into lowercase
         s = str(s)
         s = s.lower()
+        s = ' '.join([word for word in s.split() if word not in STOP_WORDS_LIST])
 
-        # remove punctuation that is not word-internal (e.g., hyphens, apostrophes) 
-        s = re.sub('\s\W', ' ', s)
-        s = re.sub('\W\s', ' ', s)
+    
+        # some further cleaning
+        # specific
+        s = re.sub(r"won\'t", "will not", s)
+        s = re.sub(r"can\'t", "can not", s)
 
-        # make sure no double spaces 
-        s = re.sub('\s+', ' ', s)
-        s = s.replace('&#039;', ' a')
+        # general
+        s = re.sub(r"n\’t", " not", s)
+        s = re.sub(r"\’re", " are", s)
+        s = re.sub(r"\’s", " is", s)
+        s = re.sub(r"\’d", " would", s)
+        s = re.sub(r"\’ll", " will", s)
+        s = re.sub(r"\’t", " not", s)
+        s = re.sub(r"\’ve", " have", s)
+        s = re.sub(r"\’m", " am", s)
+        s = re.sub(r"\'m", " am", s)
+        s = re.sub(r"n\'t", " not", s)
+        s = re.sub(r"\'re", " are", s)
+        s = re.sub(r"\'s", " is", s)
+        s = re.sub(r"\'d", " would", s)
+        s = re.sub(r"\'ll", " will", s)
+        s = re.sub(r"\'t", " not", s)
+        s = re.sub(r"\'ve", " have", s)
 
-        # remove non-ASCII chars 
-        s = re.sub(r'[^\x00-\x7F]+', '', s)
 
         return s
-
+    
+    # print(normalize_text("I’m so lostHello, "))
     suicide_posts = [normalize_text(s) for s in suicide_posts]
+
     depress_posts = [normalize_text(s) for s in depress_posts]
     general_posts = [normalize_text(s) for s in general_posts]
 
     suicide_label = ['suicide' for i in range(10000)]
-    depress_label = ['non-suicide' for i in range(10000)]
+    depress_label = ['depression' for i in range(10000)]
     general_label = ['general' for i in range(10000)]
 
 
@@ -113,3 +138,9 @@ def preprocess(file1, file2):
     
 
 suicide_posts, depress_posts, general_posts, suicide_label, depress_label, general_label = preprocess("Suicide_Detection.csv", "reddit_data.csv")
+alltokens = [word_tokenize(x) for x in general_posts ]
+alltokens = [item for sublist in alltokens for item in sublist]
+Counter = Counter(alltokens)
+most_occure = Counter.most_common(20)
+
+# print(most_occure)

@@ -8,30 +8,24 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from PIL import Image
 from statistics import mean
-
+from collections import Counter
+from nltk.tokenize import word_tokenize
+from nltk.tokenize import RegexpTokenizer
+from nltk.corpus import stopwords
 
 
 pd.set_option('display.max_columns', 100)
 sns.set_style("darkgrid")
 
-
 suicide_posts, depress_posts, general_posts, suicide_label, depress_label, general_label = preprocess("Suicide_Detection.csv", "reddit_data.csv")
 
-# Create CountVectorizer, which create bag-of-words model.
-# stop_words : Specify language to remove stopwords. 
-sui_vectorizer = CountVectorizer(stop_words='english')
-
-# Learn vocabulary in sentences. 
-sui_vectorizer.fit(suicide_posts)
-
-# Get dictionary. 
-sui_vectorizer.get_feature_names()
 
 #DEFINING A FUNCTION TO VISUALISE MOST USED WORDS
 def plot_most_used_words(dataname, data_series, palette):
-    #CHECKING OUT COMMON WORDS IN r/SuicideWatch USING CVEC
+    #CHECKING OUT COMMON WORDS IN THE DATA USING CVEC
     cvec = CountVectorizer(stop_words='english')
     cvec.fit(data_series)
+
     #CREATING A DATAFRAME OF EXTRACTED WORDS
     created_df = pd.DataFrame(cvec.transform(data_series).todense(),
                               columns=cvec.get_feature_names())
@@ -46,7 +40,7 @@ def plot_most_used_words(dataname, data_series, palette):
     ax = sns.barplot(y= top_20_words_df.index, x="count", data=top_20_words_df, palette = palette)
     
     plt.xlabel("Count", fontsize=9)
-    plt.ylabel('Common Words in ' + dataname, fontsize=9)
+    plt.ylabel(dataname, fontsize=9)
     plt.savefig('/home/nauxiy/Workspace/Suicidal-posts-detection-SNLP-/plots/' + dataname + ".png")
 
     # plt.show()
@@ -54,7 +48,7 @@ def plot_most_used_words(dataname, data_series, palette):
 
 plot_most_used_words("Common Words in Suicidal Posts", suicide_posts, palette="ocean_r")
 plot_most_used_words("Common Words in Depression Posts", depress_posts, palette="magma")
-plot_most_used_words("Common Words in General Posts", general_posts, palette="ocean_r")
+plot_most_used_words("Common Words in General Posts", general_posts, palette="Greens_r")
 
 # COLLECT EACT POST'S LENGTH
 sui_selftext_length = [len(suicide_posts[i]) for i in range(len(suicide_posts))]
