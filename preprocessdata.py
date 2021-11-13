@@ -77,55 +77,13 @@ def preprocess(file1, file2):
     # SET LABEL "GENERAL" TO ALL POSTS FROM THE GENERAL TOPICS
     general_posts = {x:'general' for x in general_posts}
     
-    # because the "general" posts are way less than the suicide and non-suicide posts (depression posts)
-    # to balance each class and shorten the training time, only 10000 of "general", "suicide" and "non-suicide" posts will be kept"""
+    # BECAUSE THE "GENERAL" POSTS ARE WAY LESS THAN THE SUICIDE AND NON-SUICIDE POSTS (DEPRESSION POSTS)
+    # TO BALANCE EACH CLASS AND SHORTEN THE TRAINING TIME, ONLY 10000 OF "GENERAL", "SUICIDE" AND "NON-SUICIDE" POSTS WILL BE KEPt"""
     
     suicide_posts = suicide_posts[:10000]
     depress_posts = depress_posts[:10000]
     general_posts = list(general_posts.keys())[:10000]
     
-    # # Stop words are nothing but high-frequency words
-    STOP_WORDS_LIST =stopwords.words('english')
-
-    # remove the unnecessary meaningless chars 
-    def normalize_text(s):
-        # convert all posts into lowercase
-        s = str(s)
-        s = s.lower()
-        s = ' '.join([word for word in s.split() if word not in STOP_WORDS_LIST])
-
-    
-        # some further cleaning
-        # specific
-        s = re.sub(r"won\'t", "will not", s)
-        s = re.sub(r"can\'t", "can not", s)
-
-        # general
-        s = re.sub(r"n\’t", " not", s)
-        s = re.sub(r"\’re", " are", s)
-        s = re.sub(r"\’s", " is", s)
-        s = re.sub(r"\’d", " would", s)
-        s = re.sub(r"\’ll", " will", s)
-        s = re.sub(r"\’t", " not", s)
-        s = re.sub(r"\’ve", " have", s)
-        s = re.sub(r"\’m", " am", s)
-        s = re.sub(r"\'m", " am", s)
-        s = re.sub(r"n\'t", " not", s)
-        s = re.sub(r"\'re", " are", s)
-        s = re.sub(r"\'s", " is", s)
-        s = re.sub(r"\'d", " would", s)
-        s = re.sub(r"\'ll", " will", s)
-        s = re.sub(r"\'t", " not", s)
-        s = re.sub(r"\'ve", " have", s)
-
-
-        return s
-    
-    # print(normalize_text("I’m so lostHello, "))
-    suicide_posts = [normalize_text(s) for s in suicide_posts]
-
-    depress_posts = [normalize_text(s) for s in depress_posts]
-    general_posts = [normalize_text(s) for s in general_posts]
 
     suicide_label = ['suicide' for i in range(10000)]
     depress_label = ['depression' for i in range(10000)]
