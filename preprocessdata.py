@@ -16,7 +16,7 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import precision_recall_fscore_support
 from nltk.tokenize import word_tokenize
 import nltk
-from nltk.corpus import stopwords
+
 
 
 def preprocess(file1, file2):

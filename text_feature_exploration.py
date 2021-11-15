@@ -32,12 +32,12 @@ def plot_most_used_words(dataname, data_series, palette):
     total_words = created_df.sum(axis=0)
     
     #CREATING A FINAL DATAFRAME OF THE TOP 20 WORDS
-    top_20_words = total_words.sort_values(ascending = False).head(20)
-    top_20_words_df = pd.DataFrame(top_20_words, columns = ["count"])
+    top_50_words = total_words.sort_values(ascending = False).head(50)
+    top_50_words_df = pd.DataFrame(top_50_words, columns = ["count"])
     #PLOTTING THE COUNT OF THE TOP 20 WORDS
     sns.set_style("white")
     plt.figure(figsize = (15, 8))
-    ax = sns.barplot(y= top_20_words_df.index, x="count", data=top_20_words_df, palette = palette)
+    ax = sns.barplot(y= top_50_words_df.index, x="count", data=top_50_words_df, palette = palette)
     
     plt.xlabel("Count", fontsize=9)
     plt.ylabel(dataname, fontsize=9)
