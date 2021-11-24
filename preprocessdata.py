@@ -80,14 +80,15 @@ def preprocess(file1, file2):
     # BECAUSE THE "GENERAL" POSTS ARE WAY LESS THAN THE SUICIDE AND NON-SUICIDE POSTS (DEPRESSION POSTS)
     # TO BALANCE EACH CLASS AND SHORTEN THE TRAINING TIME, ONLY 10000 OF "GENERAL", "SUICIDE" AND "NON-SUICIDE" POSTS WILL BE KEPt"""
     
-    suicide_posts = suicide_posts[:10000]
-    depress_posts = depress_posts[:10000]
-    general_posts = list(general_posts.keys())[:10000]
+    suicide_posts = suicide_posts[:5000]
+    depress_posts = depress_posts[:5000]
+    general_posts = list(general_posts.keys())[:5000]
+    extra_suicide_posts = suicide_posts[5001:10000]
     
 
-    suicide_label = ['suicide' for i in range(10000)]
-    depress_label = ['depression' for i in range(10000)]
-    general_label = ['general' for i in range(10000)]
+    suicide_label = ['suicide' for i in range(5000)]
+    depress_label = ['depression' for i in range(5000)]
+    general_label = ['general' for i in range(5000)]
 
 
     return suicide_posts, depress_posts, general_posts, suicide_label, depress_label, general_label

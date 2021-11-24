@@ -2,7 +2,7 @@
     This script adopts the multinomial Naive Bayes classifier to predict the label of the posts
     Note: Only suicidal and general posts are used in this approach """
 from preprocessdata import preprocess
-from encoder import data_split, countvec_encode, NBmodel, tfidfvec_encode
+from encoder import data_split, countvec_encode, NBmodel, tfidfvec_encode, SVMmodel
 
 # Using only suicide and general posts
 if __name__ == "__main__":
@@ -16,14 +16,18 @@ if __name__ == "__main__":
     print("By using CountVectorizer, the model reaches:")
     print("____________________________")
     print("CountVectorizer preformance: ")
-    NBmodel(vec_train_x, vec_test_x, vec_train_y, vec_test_y)
-    # print("By using CountVectorizer, the model reaches:")
-    # print("Precision: " + str(precision) + "\nRecall: " + str(recall) + "\nF-beta score: " + str(f_beta) )
+    SVMmodel(vec_train_x, vec_test_x, vec_train_y, vec_test_y)
+
     
     # print tf-idf vectorized result
     print("____________________________")
     print("TF-IDF preformance: ")
     tf_vec_train_x, tf_vec_test_x, tf_vec_train_y, tf_vec_test_y = tfidfvec_encode(train_posts, train_label, test_posts, test_label)
-    NBmodel(tf_vec_train_x, tf_vec_test_x, tf_vec_train_y, tf_vec_test_y)
-    # print("By using TF-IDF Vectorizer, the model reaches:")
-    # print("Precision: " + str(precision) + "\nRecall: " + str(recall) + "\nF-beta score: " + str(f_beta) )
+    SVMmodel(tf_vec_train_x, tf_vec_test_x, tf_vec_train_y, tf_vec_test_y)
+
+"""    The best performance is from TF-IDF with alpha set as 0.01:
+        Accuracy: 0.9536250000000001
+        Precision: 0.9423356307733128
+        Recall: 0.966106850039672
+        F1: 0.9540325162212561
+"""
