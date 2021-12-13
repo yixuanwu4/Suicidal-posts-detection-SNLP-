@@ -10,7 +10,7 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import precision_recall_fscore_support, accuracy_score,recall_score,precision_score,f1_score
 
 
-random.seed(14)
+random.seed(3)
 
 def data_split(post1, post2, label1, label2):
     target_posts = post1 + post2
@@ -109,7 +109,7 @@ def NBmodel(train_x, test_x, train_y, test_y):
 def SVMmodel(train_x, test_x, train_y, test_y):
 
     # defining parameter range
-    tuned_parameters =  [{ 'C': [0.001, 0.01, 0.1, 10, 25, 50, 100, 1000]}]              
+    tuned_parameters =  [{'kernel': ['linear'], 'C': [0.001, 0.01, 0.1, 10, 25, 50, 100, 1000]}]              
     # tuned_parameters =  [{ 'C': [ 0.1]}]
     clf = GridSearchCV(svm.SVC(), tuned_parameters, cv=8,
                        scoring='f1')
