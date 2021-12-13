@@ -14,7 +14,7 @@ def preprocess(file1, file2):
 
     suicide_depression_posts = {}
 
-    with open(file1) as f:
+    with open(file1, encoding = 'utf8') as f:
         csvr = csv.reader(f, delimiter=',')
 
         for row in csvr:
@@ -29,7 +29,7 @@ def preprocess(file1, file2):
 
     csv.field_size_limit(sys.maxsize)       
 
-    with open(file2) as z:
+    with open(file2, encoding = 'utf8') as z:
         csvr = csv.reader(z, delimiter=',')
 
         for row in csvr:
