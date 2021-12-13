@@ -17,8 +17,11 @@ from nltk.corpus import stopwords
 pd.set_option('display.max_columns', 100)
 sns.set_style("darkgrid")
 
-suicide_posts, depress_posts, general_posts, suicide_label, depress_label, general_label = preprocess("Suicide_Detection.csv", "reddit_data.csv")
+suicide_posts, depress_posts, general_posts, suicide_label, depress_label, general_label, extra_suicide_posts, extra_depression_posts, extra_general_posts, extra_suicide_labels, extra_depression_labels, extra_general_labels = preprocess("Suicide_Detection.csv", "reddit_data.csv")
 
+all_suicide_posts = suicide_posts + extra_suicide_posts
+all_depression_posts = depress_posts + extra_depression_posts
+all_general_posts = general_posts + extra_general_posts
 
 #DEFINING A FUNCTION TO VISUALISE MOST USED WORDS
 def plot_most_used_words(dataname, data_series, palette):
@@ -31,7 +34,7 @@ def plot_most_used_words(dataname, data_series, palette):
                               columns=cvec.get_feature_names())
     total_words = created_df.sum(axis=0)
     
-    #CREATING A FINAL DATAFRAME OF THE TOP 20 WORDS
+    #CREATING A FINAL DATAFRAME OF THE TOP 50 WORDS
     top_50_words = total_words.sort_values(ascending = False).head(50)
     top_50_words_df = pd.DataFrame(top_50_words, columns = ["count"])
     #PLOTTING THE COUNT OF THE TOP 20 WORDS
@@ -46,14 +49,14 @@ def plot_most_used_words(dataname, data_series, palette):
     # plt.show()
     
 
-plot_most_used_words("Common Words in Suicidal Posts", suicide_posts, palette="ocean_r")
-plot_most_used_words("Common Words in Depression Posts", depress_posts, palette="magma")
-plot_most_used_words("Common Words in General Posts", general_posts, palette="Greens_r")
+plot_most_used_words("Common Words in Suicidal Posts", all_suicide_posts, palette="ocean_r")
+plot_most_used_words("Common Words in Depression Posts", all_depression_posts, palette="magma")
+plot_most_used_words("Common Words in General Posts", all_general_posts, palette="Greens_r")
 
 # COLLECT EACT POST'S LENGTH
-sui_selftext_length = [len(suicide_posts[i]) for i in range(len(suicide_posts))]
-dep_selftext_length = [len(depress_posts[i]) for i in range(len(suicide_posts))]
-gen_selftext_length = [len(general_posts[i]) for i in range(len(suicide_posts))]
+sui_selftext_length = [len(all_suicide_posts[i]) for i in range(len(all_suicide_posts))]
+dep_selftext_length = [len(all_depression_posts[i]) for i in range(len(all_depression_posts))]
+gen_selftext_length = [len(all_general_posts[i]) for i in range(len(all_general_posts))]
 
 # CALCULATE AVERAGE POST LENGTH IN EACH CLASS
 ave_sui_selftext_length = mean(sui_selftext_length)
@@ -68,7 +71,7 @@ print("Average length of a general post: {}".format(ave_gen_selftext_length))
 
 # MAPPING POST LENGTH WITH THE LABEL
 all_post_length = sui_selftext_length + dep_selftext_length + gen_selftext_length
-all_labels = suicide_label + depress_label + general_label 
+all_labels = suicide_label + extra_general_labels + depress_label + extra_depression_labels + general_label + extra_general_labels
 label_post_dict = {'post length':all_post_length, 'labels': all_labels}
 df = pd.DataFrame(label_post_dict)
 sns.set_theme(style="ticks", palette="pastel")

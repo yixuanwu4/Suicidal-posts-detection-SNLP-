@@ -1,18 +1,16 @@
 import random
 import numpy as np
-from sklearn.model_selection import cross_val_score, GridSearchCV, cross_validate
-from numpy.lib.function_base import average, vectorize
+from sklearn.model_selection import cross_val_score, GridSearchCV
 # function for transforming documents into counts
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 # function for encoding categories
-from sklearn import svm, metrics
-from sklearn.pipeline import Pipeline
+from sklearn import svm
 # the Naive Bayes model
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import precision_recall_fscore_support, accuracy_score,recall_score,precision_score,f1_score
-from preprocessdata import preprocess
 
 
+random.seed(14)
 
 def data_split(post1, post2, label1, label2):
     target_posts = post1 + post2
@@ -49,9 +47,6 @@ def countvec_encode(train_posts, train_label, test_posts, test_label):
     train_x = vectorizer.fit_transform(train_posts)
     test_x = vectorizer.transform(test_posts)
     
-    # encoder = LabelEncoder()
-    # train_y = encoder.fit_transform(train_label)
-    # test_y = encoder.transform(test_label)
     train_y = train_label
     test_y = test_label
 
@@ -89,65 +84,54 @@ def NBmodel(train_x, test_x, train_y, test_y):
         allresult[eachalpha] = "Accuracy: " + str(np.mean(cv_accuracy)) \
         + "\nPrecision: " + str(np.mean(cv_precision)) + "\nRecall: " + str(np.mean(cv_recall)) \
         + "\nF1: " + str(np.mean(cv_f1))
+        
         if np.mean(cv_f1) > 0.9 and np.mean(cv_precision) > 0.9 and np.mean(cv_recall) > 0.9:
-            print(str(eachalpha) + ":\n" + allresult[eachalpha])
             # SAVE ALL ALPHA SCORES WHICH LEADS TO HIGHER THAN 0.9 ACCURACY, PRECISION AND RECALL
-            targetalphas[eachalpha] = cv_f1
+            targetalphas[eachalpha] = np.mean(cv_f1)
             bestmodel[eachalpha] = nb
-
-    bestalpha = max(zip(targetalphas.keys(), targetalphas.values()))[0]
-
+        else:
+            targetalphas[eachalpha] = np.mean(cv_f1)
+            bestmodel[eachalpha] = nb
+    
+    bestalpha = max(targetalphas, key=targetalphas.get)
 
     targetnb = bestmodel[bestalpha]
 
     pred_y = targetnb.predict(test_x)
+    accuracy = accuracy_score(test_y,pred_y)
     precision, recall, f1_xcore, x = precision_recall_fscore_support(test_y, pred_y, average = 'binary', pos_label=1)
-    print("---------------------------------------------")
-    print("ALPHA is: " + str(bestalpha) + "\nPrecision: " + str(precision) + "\nRecall: " + str(recall) + "\nF-beta score: " + str(f1_xcore) )
-    # return precision, recall, f1_xcore
+    print("####################################")
+    print("By using MultinomialNB, the best parameter and its evaluation metrics are:")
+    print("Best Alpha: " + str(bestalpha) + "\nAccuracy: " + str(accuracy) + "\nPrecision: " + str(precision) + "\nRecall: " + str(recall) + "\nF-beta score: " + str(f1_xcore) + "\n")
+
+    return precision, recall, f1_xcore, targetnb
     
 def SVMmodel(train_x, test_x, train_y, test_y):
 
     # defining parameter range
-    tuned_parameters =  [{'kernel': ['linear'], 'C': [0.001, 0.10, 0.1, 10, 25, 50, 100, 1000]}]              
-    scores = ['accuracy', 'precision', 'recall', 'f1']
-
+    tuned_parameters =  [{ 'C': [0.001, 0.01, 0.1, 10, 25, 50, 100, 1000]}]              
+    # tuned_parameters =  [{ 'C': [ 0.1]}]
     clf = GridSearchCV(svm.SVC(), tuned_parameters, cv=8,
                        scoring='f1')
    
     clf.fit(train_x, train_y)
-    #Predict values based on new parameters
+
+    # PREDICT VALUE BASED ON UPDATED PARAMETERS
     y_pred_result = clf.predict(test_x)
-    # New Model Evaluation metrics 
-    print('Accuracy Score : ' + str(accuracy_score(test_y,y_pred_result)))
-    print('Precision Score : ' + str(precision_score(test_y,y_pred_result)))
-    print('Recall Score : ' + str(recall_score(test_y,y_pred_result)))
-    print('F1 Score : ' + str(f1_score(test_y,y_pred_result)))
-    # print(clf.fit(train_x, train_y).score(test_x, test_y))
-
-    # print("Best parameters set found on development set:")
-
-    # print(clf.best_params_)
-
-    # print('Training accuracy')
-    # print(clf.best_score_)
-    # print(clf.best_estimator_)
-
- 
-    # print('****Results****')
-    # svm_pred=clf.predict(train_x)
-
-
-
-    # print("confusion matrix\n", metrics.confusion_matrix(train_y, svm_pred))
-
-    # print("\t\taccuracy: {}".format(metrics.accuracy_score(train_y, svm_pred)))
-    # print("\t\troc_auc_score: {}".format(metrics.roc_auc_score(train_y, svm_pred)))
-    # print("\t\tcohen_kappa_score: {}".format(metrics.cohen_kappa_score(train_y, svm_pred)))
-
-
-
-    # print(metrics.classification_report(train_y, svm_pred)) 
+    # NEW MODEL EVALUATION METRICS 
+    print("####################################")
+    print("By using SVM model, the best parameter and its evaluation metrics are:")
+    bestpara = clf.best_estimator_
+    accuracy = accuracy_score(test_y,y_pred_result)
+    precision = precision_score(test_y,y_pred_result)
+    recall = recall_score(test_y,y_pred_result)
+    f1 = f1_score(test_y,y_pred_result)
+    print('Best parameters: ' + str(bestpara))
+    print('Accuracy Score : ' + str(accuracy))
+    print('Precision Score : ' + str(precision))
+    print('Recall Score : ' + str(recall))
+    print('F1 Score : ' + str(f1))
+    return precision, recall, f1, clf
 
     
     
